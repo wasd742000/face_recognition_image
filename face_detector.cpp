@@ -62,5 +62,36 @@ int FaceDetector::detectFace() {
 }
 
 void FaceDetector::resizeImage(int maxWidth, int maxHeight) {
+	// get image size
+	cv::Size imgSize = _image.size();
 
+	// resize image with maxWidth
+	if (imgSize.width/ imgSize.height > maxWidth/maxHeight){
+		cv::resize(_image, _image, cv::Size(maxWidth, imgSize.height * maxWidth / imgSize.width));
+	}
+	// resize image with maxHeight
+	else { 
+		cv::resize(_image, _image, cv::Size(maxHeight, imgSize.width * maxHeight / imgSize.height));
+	}
 }
+
+void FaceDetector::displayResult() {
+	for (int i = 0; i < _faces.size(); i++) {
+		// calculate center point of the point for bor
+		cv::Point center(_faces[i].x + _faces[i].width / 2, _faces[i].y + _faces[i].height / 2);
+		// draw ellipse arround face
+		cv::ellipse(_image, center, cv::Size(_faces[i].width / 2, _faces[i].height / 2), 0, 0, 360, cv::Scalar(0, 255, 0), 10, 8, 0);
+	}
+
+	// resize image to compact displaying
+	resizeImage(1280, 720);
+
+	// create window for display
+	cv::namedWindow("Face detection", cv::WINDOW_AUTOSIZE);
+	cv::imshow("Face detection", _image);
+	cv::waitKey(0);
+}
+
+//void FaceDetector::generateJSON() {
+//	nlohmann::json result
+//}
